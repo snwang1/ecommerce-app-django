@@ -57,9 +57,3 @@ $(document).ready(function() {
     
 }); 
 // jquery end
-
-setTimeout(function() {
-    $(".messages").fadeTo(400, 0).slideUp(400, function(){
-        $(this).remove();
-     });
-}, 3000);
