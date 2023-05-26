@@ -3,7 +3,6 @@ from .forms import RegistrationForm
 from .models import Account
 from django.contrib import messages,auth
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 
 # Verification email
 from django.contrib.sites.shortcuts import get_current_site
@@ -18,6 +17,9 @@ from carts.views import _cart_id
 from carts.models import Cart,CartItem
 import requests
 
+# Braintree
+#from orders.braintree_api import BraintreeAccount, gateway
+    
 
 # Create your views here.
 def register(request):
@@ -33,6 +35,9 @@ def register(request):
             user = Account.objects.create_user(first_name=first_name,last_name=last_name,email=email,username=username,password=password)
             user.phone_number = phone_number
             user.save()
+
+            #create a Braintree account for user
+            # agent_id = BraintreeAccount(user)
 
             # USER ACTIVATION
             current_site = get_current_site(request)
@@ -58,12 +63,12 @@ def register(request):
 
 
 def login(request):
+    
     if request.method == "POST":
         email = request.POST["email"]
         password = request.POST["password"]
 
         user = auth.authenticate(email=email, password=password)
-
         if user is not None:
             try:
                 cart = Cart.objects.get(cart_id=_cart_id(request))
@@ -115,6 +120,8 @@ def login(request):
                     nextPage = params["next"]
                     return redirect(nextPage)
             except:
+                #create a Braintree account for user
+                # agent_id = BraintreeAccount(request.user)
                 return redirect("home")
         else:
             messages.error(request, "Invalid email or password")
