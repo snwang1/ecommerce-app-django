@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "orders.apps.OrdersConfig",
     "carts.apps.CartsConfig",
     "store.apps.StoreConfig",
     "accounts.apps.AccountsConfig",
@@ -44,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
+    'localflavor',
+    "stripe",
 ]
 
 MIDDLEWARE = [
@@ -148,8 +151,14 @@ MESSAGE_TAGS = {
 
 
 # SMTP CONFIGURATION
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_HOST_USER = "iwuv2020@gmail.com"
-EMAIL_HOST_PASSWORD = "inodluzsloquhmpa"
-EMAIL_USE_TLS = True
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+
+
+# Stripe Keys
+STRIPE_PUBLIC_KEY=config("STRIPE_PUBLIC_KEY")
+STRIPE_SECRET_KEY=config("STRIPE_SECRET_KEY")
+STRIPE_WEBHOOK_SECRET=config("STRIPE_WEBHOOK_SECRET")
