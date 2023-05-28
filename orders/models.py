@@ -39,7 +39,6 @@ class Order(models.Model):
     full_name = models.CharField(max_length=50)
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone = models.CharField(validators=[phone_regex], max_length=17, blank=True) # Validators should be a list
-    #email = models.EmailField("User's email",max_length=50,default=self.user_email)
     address_line_1 = models.CharField(max_length=50)
     address_line_2 = models.CharField(max_length=50, blank=True)
     city = models.CharField(max_length=50)
@@ -56,11 +55,6 @@ class Order(models.Model):
 
     def full_address(self):
         return f"{self.address_line_1} {self.address_line_2}"
-    
-    # def save(self, *args, **kwargs):
-    #     if not self.email:
-    #         self.email = self.user
-    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return self.full_name
@@ -81,7 +75,3 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return self.product.product_name
-
-
-
-
