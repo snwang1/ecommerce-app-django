@@ -63,7 +63,7 @@
                             <td> 
                                 <div class="price-wrap"> 
                                     <var class="price">$ {{ cart_item.sub_total }}</var> 
-                                    <small class="text-muted"> $ {{ cart_item.product.price }}.00 each </small> 
+                                    <small class="text-muted"> $ {{ cart_item.product.price }} each </small> 
                                 </div> <!-- price-wrap .// -->
                             </td>
                             
@@ -81,22 +81,22 @@
             <div class="card-body">
                 <dl class="dlist-align">
                   <dt>Total before tax:</dt>
-                  <dd class="text-right">$ {{total}}</dd>
+                  <dd class="text-right">$ {{order.sub_total}}</dd>
                 </dl>
                 <dl class="dlist-align">
                   <dt>Estimated tax:</dt>
-                  <dd class="text-right"> $ {{tax}}</dd>
+                  <dd class="text-right"> $ {{order.tax}}</dd>
                 </dl>
                 <dl class="dlist-align">
                   <dt>Order total:</dt>
-                  <dd class="text-right text-dark b"><strong>$ {{grand_total}}</strong></dd>
+                  <dd class="text-right text-dark b"><strong>$ {{order.order_total}}</strong></dd>
                 </dl>
                 <hr>
                 <p class="text-center mb-3">
                     <img src="{% static './images/misc/payments.png' %}" height="26">
                 </p>
                 
-                <button type="button" id="checkout-button" class="btn btn-primary btn-block">Pay with Card</button>
+                <button type="button" id="checkout-button" class="btn btn-primary btn-block">Pay with card</button>
                 
             </div> <!-- card-body.// -->
             </div> <!-- card.// -->

@@ -35,7 +35,7 @@ def charges(request, order_id):
           'product_data': {
             'name': cart_item.product.product_name,
           },
-          'unit_amount': cart_item.product.price*100,
+          'unit_amount_decimal': cart_item.product.price*100,
           'currency': 'usd',
         },
         'quantity': cart_item.quantity,
@@ -93,7 +93,7 @@ def stripe_webhook(request):
     order_number = session["metadata"]["orderID"]
     payment_id = session["id"]
     payment_method = session["payment_method_types"][0]
-    status = session["status"]
+    status = session["payment_status"]
     customer_email = session["customer_details"]["email"]
 
     request.user = Account.objects.get(email=customer_email)
@@ -118,6 +118,10 @@ def payments(request, payment_id, payment_method, status, order_number):
     payment.save()
 
     order.payment = payment
+    if status == "paid":
+       order.status = "complete"
+    else:
+       order.status = "expired"
     order.is_ordered = True
     order.save()
 
@@ -178,7 +182,6 @@ def place_order(request, total=0, quantity=0):
         quantity += cart_item.quantity
     tax = (2 * total) / 100
     grand_total = total + tax
-    grand_total = f'{grand_total:.2f}'
     
     if request.method == "POST":
         form = OrderForm(request.POST)
@@ -196,6 +199,7 @@ def place_order(request, total=0, quantity=0):
             data.delivery_note = form.cleaned_data["delivery_note"]
             data.country = form.cleaned_data["country"]
             data.order_total = grand_total
+            data.sub_total = total
             data.tax = tax
             data.ip = request.META.get("REMOTE_ADDR")
             data.save()
@@ -210,18 +214,12 @@ def place_order(request, total=0, quantity=0):
             data.save()
 
             order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
-            
             stripe_pk = settings.STRIPE_PUBLIC_KEY
-            stripe_total = grand_total*100
             stripe_email = current_user.email
 
             context = {
                 "order": order,
                 "cart_items": cart_items,
-                "total": total,
-                "tax": tax,
-                "grand_total": grand_total,
-                "stripe_total": stripe_total,
                 "stripe_public_key": stripe_pk,
                 "stripe_email": stripe_email,
             }
@@ -241,15 +239,6 @@ def order_complete(request):
    try:
       order = Order.objects.get(order_number=order_number, is_ordered=True)
       ordered_products = OrderProduct.objects.filter(order_id=order.id)
-
-      subtotal = 0
-      for i in ordered_products:
-          subtotal += i.product_price * i.quantity
-
-      subtotal = format(subtotal, ".2f")
-      tax = format(order.tax, ".2f")
-      order_total = format(order.order_total, ".2f")
-
       payment = Payment.objects.get(payment_id=transID)
 
       context = {
@@ -258,14 +247,11 @@ def order_complete(request):
           'order_number': order.order_number,
           'transID': payment.payment_id,
           'payment': payment,
-          'subtotal': subtotal,
-          "tax": tax,
-          "order_total": order_total
       }
       return render(request, "orders/order_complete.html", context)
    except (Payment.DoesNotExist, Order.DoesNotExist):
-        return redirect('home')
+      return redirect('home')
   
+
 def order_incomplete(request):
-  return render(request, "orders/order_incomplete.html")
-   
+  return render(request, "orders/order_incomplete.html") 

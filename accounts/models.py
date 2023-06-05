@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.core.validators import RegexValidator
 
 
 # Create your models here.
@@ -43,7 +44,11 @@ class Account(AbstractBaseUser):
     last_name = models.CharField(max_length=50)
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(max_length=50,unique=True)
-    phone_number = models.CharField(max_length=10,blank=True)
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message="Phone number must be entered in the format: '1234567890' or '11234567890' or '+11234567890'."
+    )
+    phone_number = models.CharField(validators=[phone_regex],max_length=15,blank=True)
 
     # required
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -71,3 +76,9 @@ class Account(AbstractBaseUser):
         return True
 
     
+class UserProfile(models.Model):
+    user = models.OneToOneField(Account,on_delete=models.CASCADE)
+    profile_picture = models.ImageField(blank=True, upload_to="userprofile")
+    
+    def __str__(self):
+        return self.user.first_name
