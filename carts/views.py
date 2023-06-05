@@ -168,9 +168,6 @@ def cart(request,total=0,quantity=0,cart_items=None):
             quantity += cart_item.quantity
         tax = (2 * total) / 100
         grand_total = total + tax
-        total = f'{total:.2f}'
-        tax = f'{tax:.2f}'
-        grand_total = f'{grand_total:.2f}'
     except ObjectDoesNotExist:
         pass
 
@@ -199,9 +196,6 @@ def checkout(request,total=0,quantity=0,cart_items=None):
             quantity += cart_item.quantity
         tax = (2 * total) / 100
         grand_total = total + tax
-        total = f'{total:.2f}'
-        tax = f'{tax:.2f}'
-        grand_total = f'{grand_total:.2f}'
     except ObjectDoesNotExist:
         pass
 
